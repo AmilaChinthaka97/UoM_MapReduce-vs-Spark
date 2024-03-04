@@ -1,0 +1,67 @@
+--carrier_delay
+SELECT year, AVG( (carrier_delay / arr_delay) * 100) AS avg_carrier_delay_percentage 
+FROM flight_data_table WHERE arr_delay IS NOT NULL AND arr_delay !=0 AND carrier_delay IS NOT NULL 
+GROUP BY year ORDER BY year DESC;
+
+--NAS delay
+SELECT year, AVG( (nas_delay / arr_delay) * 100) AS avg_naa_delay_percentage 
+FROM flight_data_table WHERE arr_delay IS NOT NULL AND arr_delay !=0 AND nas_delay IS NOT NULL 
+GROUP BY year ORDER BY year DESC;
+
+--late aircraft delay
+SELECT year, AVG( (late_aircraft_delay / arr_delay) * 100) AS avg_late_aircreft_delay_percentage 
+FROM flight_data_table WHERE arr_delay IS NOT NULL AND arr_delay !=0 AND late_aircraft_delay IS NOT NULL 
+GROUP BY year ORDER BY year DESC;
+
+--security_delay
+SELECT year, AVG( (security_delay / arr_delay) * 100) AS avg_security_delay_percentage 
+FROM flight_data_table WHERE arr_delay IS NOT NULL AND arr_delay !=0 AND security_delay IS NOT NULL 
+GROUP BY year ORDER BY year DESC;
+
+
+--weather_delay
+SELECT year, AVG( (weather_delay / arr_delay) * 100) AS avg_weather_delay_percentage 
+FROM flight_data_table WHERE arr_delay IS NOT NULL AND arr_delay !=0 AND weather_delay IS NOT NULL 
+GROUP BY year ORDER BY year DESC;
+
+CREATE EXTERNAL TABLE flight_data_table (
+id INT,
+year INT,
+month INT,
+day_of_month INT,
+day_of_week INT,
+dep_time INT,
+crs_dep_time INT,
+arr_time INT,
+crs_arr_time INT,
+unique_carrier STRING,
+flight_num INT,
+tail_num STRING,
+actual_elapsed_time INT,
+crs_elapsed_time INT,
+air_time INT,
+arr_delay INT,
+dep_delay INT,
+origin STRING,
+dest STRING,
+distance INT,
+taxi_in INT,
+taxi_out INT,
+cancelled INT,
+cancellation_code STRING,
+diverted INT,
+carrier_delay INT,
+weather_delay INT,
+nas_delay INT,
+security_delay INT,
+late_aircraft_delay INT )
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+LOCATION 's3://map-reduce-vs-spark/hive/';
+
+show database;
+show tables;
+describe flight_data_table;
+
+LOAD DATA INPATH 's3://map-reduce-vs-spark/input/DelayedFlights-updated.csv' OVERWRITE INTO TABLE flight_data_table;

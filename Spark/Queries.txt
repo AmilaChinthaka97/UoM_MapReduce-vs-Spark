@@ -1,0 +1,22 @@
+carrier_delay
+val start = System.currentTimeMillis(); spark.sql("SELECT _c1 as year, AVG((_c25/ _c15) * 100) AS avg_carrier_delay_percentage FROM flight_data_table WHERE _c15 IS NOT NULL AND _c15 != 0 AND _c25 IS NOT NULL GROUP BY _c1 ORDER BY _c1 DESC").show(); val end = System.currentTimeMillis(); println(s"Execution Time = ${end - start} ms")
+
+NAS delay
+val start = System.currentTimeMillis(); spark.sql("SELECT _c1 as year, AVG((_c27/ _c15) * 100) AS avg_nas_delay_percentage FROM flight_data_table WHERE _c15 IS NOT NULL AND _c15 != 0 AND _c27 IS NOT NULL GROUP BY _c1 ORDER BY _c1 DESC").show(); val end = System.currentTimeMillis(); println(s"Execution Time = ${end - start} ms")
+
+late aircraft delay
+val start = System.currentTimeMillis(); spark.sql("SELECT _c1 as year, AVG((_c29/ _c15) * 100) AS avg_late_aircraft_delay_percentage FROM flight_data_table WHERE _c15 IS NOT NULL AND _c15 != 0 AND _c29 IS NOT NULL GROUP BY _c1 ORDER BY _c1 DESC").show(); val end = System.currentTimeMillis(); println(s"Execution Time = ${end - start} ms")
+
+security_delay
+val start = System.currentTimeMillis(); spark.sql("SELECT _c1 as year, AVG((_c28/ _c15) * 100) AS avg_security_delay_percentage FROM flight_data_table WHERE _c15 IS NOT NULL AND _c15 != 0 AND _c26 IS NOT NULL GROUP BY _c1 ORDER BY _c1 DESC").show(); val end = System.currentTimeMillis(); println(s"Execution Time = ${end - start} ms")
+
+weather delay
+val start = System.currentTimeMillis(); spark.sql("SELECT _c1 as year, AVG((_c26/ _c15) * 100) AS avg_weather_delay_percentage FROM flight_data_table WHERE _c15 IS NOT NULL AND _c15 != 0 AND _c26 IS NOT NULL GROUP BY _c1 ORDER BY _c1 DESC").show(); val end = System.currentTimeMillis(); println(s"Execution Time = ${end - start} ms")
+
+var df = spark.read.format("csv").load("s3://map-reduce-vs-spark/input/DelayedFlights-updated.csv")
+df.write.format("parquet").partitionBy("_c1").save("s3://map-reduce-vs-spark/spark/DelayedFlights-updated-df")
+df.show()
+
+val df2 = spark.read.format("parquet").load("s3://map-reduce-vs-spark/spark/DelayedFlights-updated-df")
+df2.show()
+df2.createOrReplaceTempView("flight_data_table") 
